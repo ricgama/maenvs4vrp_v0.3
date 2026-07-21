@@ -36,21 +36,42 @@ If you want to have a grasp of the basics about the library, you can check our `
     :hidden:
     :caption: Environments
     
+    environments/cvrp/cvrp
     environments/cvrpstw/cvrpstw
     environments/cvrptw/cvrptw
     environments/dsvrptw/dsvrptw
     environments/dvrptw/dvrptw
     environments/gmtdvrp/gmtdvrp
     environments/gmtvrp/gmtvrp
-    environments/htop/htop
-    environments/mtdvrp/mtdvrp
+    environments/hcvrp/hcvrp
     environments/mdvrptw/mdvrptw
+    environments/mtdvrp/mtdvrp
     environments/mtvrp/mtvrp
+    environments/pcvrp/pcvrp
     environments/pcvrptw/pcvrptw
     environments/pdptw/pdptw
     environments/sdvrptw/sdvrptw
     environments/top/top
     environments/toptw/toptw
+
+.. toctree::
+    :maxdepth: 2
+    :hidden:
+    :caption: Parallel Environments
+
+    parallel_environments/cvrp/cvrp
+    parallel_environments/pcvrp/pcvrp
+    parallel_environments/pcvrptw/pcvrptw
+    parallel_environments/top/top
+    parallel_environments/toptw/toptw
+
+.. toctree::
+    :maxdepth: 2
+    :hidden:
+    :caption: Neuro Solvers
+
+    neuro_solvers/attention_model/attention_model
+    neuro_solvers/two_d_ptr/two_d_ptr
 
 .. toctree::
     :maxdepth: 2
@@ -65,8 +86,8 @@ If you want to have a grasp of the basics about the library, you can check our `
     :titlesonly:
     :caption: Tutorials
 
-    notebooks/1.0.0_quickstart_cvrptw.ipynb
-    notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.ipynb
-    notebooks/3.0.0_multitask_environments.ipynb
-    notebooks/4.0.0_maenvs4vrp_stochastic_environments.ipynb
-    notebooks/5.0.0_PyVRP_cvrptw_solver.ipynb
+    learning_notebooks/1.0.0_quickstart_cvrptw.ipynb
+    learning_notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.ipynb
+    learning_notebooks/3.0.0_multitask_environments.ipynb
+    learning_notebooks/4.0.0_maenvs4vrp_stochastic_environments.ipynb
+    learning_notebooks/5.0.0_PyVRP_cvrptw_solver.ipynb
