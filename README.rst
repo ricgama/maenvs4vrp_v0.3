@@ -6,19 +6,23 @@
 
 MAEnvs4VRP is a library comprising multi-agent environments for simulating classic vehicle routing problems.
 
-`Documentation <https://maenvs4vrp.readthedocs.io/en/latest/>`_ | `Install <#install>`_ | `Quickstart Notebook <https://maenvs4vrp.readthedocs.io/en/latest/content/start.html>`_ | `Train Your Model <#training>`_ | `Paper <https://arxiv.org/abs/2411.14411>`_
+`Documentation <https://maenvs4vrp.readthedocs.io/en/latest/>`_ | `Install <#install>`_ | `Quickstart Notebook <https://maenvs4vrp.readthedocs.io/en/latest/content/start.html>`_ | `Train Your Model <#training>`_ | `Paper (IJOC) <https://pubsonline.informs.org/doi/10.1287/ijoc.2025.1211>`_ | `Preprint <https://arxiv.org/abs/2411.14411>`_
 
 .. image:: https://colab.research.google.com/assets/colab-badge.svg
     :alt: Google Colab Badge
-    :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/notebooks/1.0.0-quickstart-cvrptw.ipynb
+    :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/1.0.0_quickstart_cvrptw.ipynb
 
-What's NEW in v0.2!
+What's NEW in v0.3!
 =====================
 
-- Added six new environments: **DVRPTW**, **DSVRPTW**, **MTVRP**, **MTDVRP**, **GMTVRP**, and **GMTDVRP**
-- Introduced three new hands-on Jupyter notebook tutorials
-- Integrated plotting tools for visualization and analysis
-- Now every environment includes a ``check_solution_validity()`` method
+- Added four new environments: **CVRP**, **HCVRP**, **PCVRP**, and **TOP**
+- Introduced **Parallel Environments** — vectorized (batched) variants for five problems: CVRP, PCVRP, PCVRPTW, TOP, and TOPTW
+- Added **Neuro Solver** baselines: Attention Model (REINFORCE, PPO, GRPO) and 2D-Ptr (REINFORCE)
+- Sequential environments now support three **policy training modes** beyond agent-selection rules:
+
+  - **Agent → Action**: agent is selected first, then an action is chosen for that agent
+  - **Action → Agent**: an action is chosen first, then the agent to execute it is selected
+  - **Joint (Agent, Action)**: agent and action are selected simultaneously as a pair
 
 Environments
 ============
@@ -27,48 +31,107 @@ Environments
    :widths: 25 5 5
    :header-rows: 1
 
-   * - Evironment
+   * - Environment
      - Source
-     - Description
+     - Docs
+   * - CVRP (Capacitated Vehicle Routing Problem)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/cvrp>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/cvrp/cvrp.html>`_
    * - CVRPSTW (Capacitated Vehicle Routing Problem with Soft Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/cvrpstw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/cvrpstw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/cvrpstw/cvrpstw.html>`_
    * - CVRPTW (Capacitated Vehicle Routing Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/cvrptw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/cvrptw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/cvrptw/cvrptw.html>`_
    * - DSVRPTW (Dynamic Stochastic Vehicle Routing Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/dsvrptw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/dsvrptw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/dsvrptw/dsvrptw.html>`_
    * - DVRPTW (Dynamic Vehicle Routing Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/dvrptw>`_
-     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/dsvrptw/dvrptw.html>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/dvrptw>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/dvrptw/dvrptw.html>`_
    * - GMTDVRP (General Multi-Tasking Depot Vehicle Routing Problems)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/gmtdvrp>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/gmtdvrp>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/gmtdvrp/gmtdvrp.html>`_
    * - GMTVRP (General Multi-Tasking Vehicle Routing Problems)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/gmtvrp>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/gmtvrp>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/gmtvrp/gmtvrp.html>`_
+   * - HCVRP (Heterogeneous Capacitated Vehicle Routing Problem)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/hcvrp>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/hcvrp/hcvrp.html>`_
    * - MDVRPTW (Multi-Depot Vehicle Routing Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/mdvrptw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/mdvrptw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/mdvrptw/mdvrptw.html>`_
    * - MTDVRP (Multi-Tasking Depot Vehicle Routing Problems)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/mtdvrp>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/mtdvrp>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/mtdvrp/mtdvrp.html>`_
    * - MTVRP (Multi-Tasking Vehicle Routing Problems)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/mtvrp>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/mtvrp>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/mtvrp/mtvrp.html>`_
+   * - PCVRP (Prize Collecting Vehicle Routing Problem)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/pcvrp>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/pcvrp/pcvrp.html>`_
    * - PCVRPTW (Prize Collecting Vehicle Routing Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/pcvrptw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/pcvrptw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/pcvrptw/pcvrptw.html>`_
    * - PDPTW (Pickup and Delivery Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/pdptw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/pdptw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/pdptw/pdptw.html>`_
    * - SDVRPTW (Split Delivery Vehicle Routing Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/sdvrptw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/sdvrptw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/sdvrptw/sdvrptw.html>`_
+   * - TOP (Team Orienteering Problem)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/top>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/top/top.html>`_
    * - TOPTW (Team Orienteering Problem with Time Windows)
-     - `Code <https://github.com/ricgama/maenvs4vrp/tree/master/maenvs4vrp/environments/toptw>`_
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/environments/toptw>`_
      - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/environments/toptw/toptw.html>`_
+
+Parallel Environments
+=====================
+
+Vectorized (batched) environments that process multiple problem instances simultaneously, enabling faster training through parallelism.
+
+.. list-table:: Available Parallel Environments:
+   :widths: 25 5 5
+   :header-rows: 1
+
+   * - Environment
+     - Source
+     - Docs
+   * - CVRP (Capacitated Vehicle Routing Problem)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/parallel_environments/cvrp>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/parallel_environments/cvrp/cvrp.html>`_
+   * - PCVRP (Prize Collecting Vehicle Routing Problem)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/parallel_environments/pcvrp>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/parallel_environments/pcvrp/pcvrp.html>`_
+   * - PCVRPTW (Prize Collecting Vehicle Routing Problem with Time Windows)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/parallel_environments/pcvrptw>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/parallel_environments/pcvrptw/pcvrptw.html>`_
+   * - TOP (Team Orienteering Problem)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/parallel_environments/top>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/parallel_environments/top/top.html>`_
+   * - TOPTW (Team Orienteering Problem with Time Windows)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/parallel_environments/toptw>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/parallel_environments/toptw/toptw.html>`_
+
+Neuro Solvers
+=============
+
+Built-in neural network baselines ready to train on any parallel environment.
+
+.. list-table:: Available Neuro Solvers:
+   :widths: 25 5 5
+   :header-rows: 1
+
+   * - Solver
+     - Source
+     - Docs
+   * - Attention Model (REINFORCE / PPO / GRPO)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/neuro_solvers/attention_model>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/neuro_solvers/attention_model/attention_model.html>`_
+   * - 2D-Ptr (REINFORCE)
+     - `Code <https://github.com/MAEnvs4VRP/maenvs4vrp/tree/master/maenvs4vrp/neuro_solvers/2d_ptr>`_
+     - `Docs <https://maenvs4vrp.readthedocs.io/en/latest/neuro_solvers/two_d_ptr/two_d_ptr.html>`_
 
 Install
 ==========
@@ -103,7 +166,7 @@ Clone the repository and install the package:
 
 .. code:: shell
 
-    git clone https://github.com/ricgama/maenvs4vrp.git && cd maenvs4vrp
+    git clone https://github.com/MAEnvs4VRP/maenvs4vrp.git && cd maenvs4vrp
     uv sync
 
 That's it! ``uv sync`` automatically:
@@ -193,37 +256,37 @@ We've prepared five hands-on notebooks that walk you through the library's diffe
    * - Notebook
      - Description
      - Colab
-   * - `01: Quickstart <https://maenvs4vrp.readthedocs.io/en/latest/notebooks/1.0.0_quickstart_cvrptw.html>`_
+   * - `01: Quickstart <https://maenvs4vrp.readthedocs.io/en/latest/learning_notebooks/1.0.0_quickstart_cvrptw.html>`_
      - Learning MAEnvs4VRP basic usage.
      - |colab-quickstart|
-   * - `02: MAEnvs4VRP library <https://maenvs4vrp.readthedocs.io/en/latest/notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.html>`_
+   * - `02: MAEnvs4VRP library <https://maenvs4vrp.readthedocs.io/en/latest/learning_notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.html>`_
      - Exploring MAEnvs4VRP library with challenges.
      - |colab-challenges|
-   * - `03: Multi-Tasking Environments <https://maenvs4vrp.readthedocs.io/en/latest/notebooks/3.0.0_multitask_environments.html>`_
+   * - `03: Multi-Tasking Environments <https://maenvs4vrp.readthedocs.io/en/latest/learning_notebooks/3.0.0_multitask_environments.html>`_
      - Exploring MAEnvs4VRP multi-tasking environments.
      - |colab-multitask|
-   * - `04: Stochastic Environments <https://maenvs4vrp.readthedocs.io/en/latest/notebooks/4.0.0_maenvs4vrp_stochastic_environments.ipynb>`_
+   * - `04: Stochastic Environments <https://maenvs4vrp.readthedocs.io/en/latest/learning_notebooks/4.0.0_maenvs4vrp_stochastic_environments.html>`_
      - Adapting MAEnvs4VRP deterministic environments into stochastic ones.
      - |colab-stochastic|
-   * - `05: PyVRP <https://maenvs4vrp.readthedocs.io/en/latest/notebooks/5.0.0_PyVRP_cvrptw_solver.ipynb>`_
+   * - `05: PyVRP <https://maenvs4vrp.readthedocs.io/en/latest/learning_notebooks/5.0.0_PyVRP_cvrptw_solver.html>`_
      - Exploring PyVRP on MAEnvs4VRP instances and environments.
      - |colab-PyVRP|
 
 .. |colab-quickstart| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/notebooks/1.0.0_quickstart_cvrptw.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/1.0.0_quickstart_cvrptw.ipynb
 .. |colab-challenges| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.ipynb
 .. |colab-multitask| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/notebooks/3.0.0_multitask_environments.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/3.0.0_multitask_environments.ipynb
 .. |colab-stochastic| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/notebooks/4.0.0_maenvs4vrp_stochastic_environments.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/4.0.0_maenvs4vrp_stochastic_environments.ipynb
 .. |colab-PyVRP| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/notebooks/5.0.0_PyVRP_cvrptw_solver.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/5.0.0_PyVRP_cvrptw_solver.ipynb
 
 Training
 =============
@@ -276,23 +339,33 @@ Directory Tree Structure
     ├───maenvs4vrp
     │   ├───core
     │   ├───environments
-    │   │   ├───dvrptw
-    │   │   ├───dsvrptw
+    │   │   ├───cvrp
     │   │   ├───cvrpstw
     │   │   ├───cvrptw
+    │   │   ├───dsvrptw
+    │   │   ├───dvrptw
     │   │   ├───gmtdvrp
     │   │   ├───gmtvrp
+    │   │   ├───hcvrp
     │   │   ├───mdvrptw
     │   │   ├───mtdvrp
     │   │   ├───mtvrp
+    │   │   ├───pcvrp
     │   │   ├───pcvrptw
     │   │   ├───pdptw
     │   │   ├───sdvrptw
+    │   │   ├───top
     │   │   ├───toptw
-    │   ├───learning
-    │   │   ├───madyam
-    │   │   ├───mardam
-    │   ├───notebooks
+    │   ├───neuro_solvers
+    │   │   ├───attention_model
+    │   │   ├───two_d_ptr
+    │   ├───parallel_environments
+    │   │   ├───cvrp
+    │   │   ├───pcvrp
+    │   │   ├───pcvrptw
+    │   │   ├───top
+    │   │   ├───toptw
+    │   ├───learning_notebooks
     │   ├───utils
     ├───tests
     │   ├───unit
@@ -305,13 +378,14 @@ To credit the library in your publications, use this citation:
 
 .. code-block:: bibtex
 
-    @article{gama2024maenvs4vrp,
+    @article{gama2026maenvs4vrp,
       title={Multi-Agent Environments for Vehicle Routing Problems},
       author={Ricardo Gama and Ricardo Cunha and Daniel Fuertes and Carlos R. del-Blanco and Hugo L. Fernandes},
       year={2026},
-      journal={arXiv preprint arXiv:2411.14411},
-      note={\url{https://github.com/ricgama/maenvs4vrp}}
-      url={https://arxiv.org/abs/2411.14411},
+      journal={INFORMS Journal on Computing},
+      doi={10.1287/ijoc.2025.1211},
+      url={https://pubsonline.informs.org/doi/10.1287/ijoc.2025.1211},
+      note={\url{https://github.com/MAEnvs4VRP/maenvs4vrp}}
     }
 
 Contributing
@@ -319,7 +393,7 @@ Contributing
 We welcome contributions to **MAEnvs4VRP**!
 If you'd like to use this library in your academic research/industry projects, or if you have suggestions, feature requests, or any feedback, we'd be happy to hear from you.
 
-Feel free to `open an issue <https://github.com/ricgama/maenvs4vrp/issues>`_ or submit a `pull request <https://github.com/ricgama/maenvs4vrp/pulls>`_. If you would like to contribute, please check out our contribution guidelines `here <https://github.com/ricgama/maenvs4vrp/blob/pre_commit_setup/.github/CONTRIBUTING.rst>`_. We welcome and look forward to all contributions to MAEnvs4vrp
+Feel free to `open an issue <https://github.com/MAEnvs4VRP/maenvs4vrp/issues>`_ or submit a `pull request <https://github.com/MAEnvs4VRP/maenvs4vrp/pulls>`_. If you would like to contribute, please check out our contribution guidelines `here <https://github.com/MAEnvs4VRP/maenvs4vrp/blob/pre_commit_setup/.github/CONTRIBUTING.rst>`_. We welcome and look forward to all contributions to MAEnvs4vrp
 
 
 Acknowledgements

@@ -105,16 +105,16 @@ You can find more hands-on examples and advanced topics in the following noteboo
 
 .. |colab-quickstart| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/1.0.0_quickstart_cvrptw.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/1.0.0_quickstart_cvrptw.ipynb
 .. |colab-challenges| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/2.0.0_maenvs4vrp_exploration_and_challenges.ipynb
 .. |colab-multitask| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/3.0.0_multitask_environments.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/3.0.0_multitask_environments.ipynb
 .. |colab-stochastic| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/4.0.0_maenvs4vrp_stochastic_environments.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/4.0.0_maenvs4vrp_stochastic_environments.ipynb
 .. |colab-PyVRP| image:: https://colab.research.google.com/assets/colab-badge.svg
    :alt: Google Colab Badge
-   :target: https://colab.research.google.com/github/ricgama/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/5.0.0_PyVRP_cvrptw_solver.ipynb
+   :target: https://colab.research.google.com/github/MAEnvs4VRP/maenvs4vrp/blob/master/maenvs4vrp/learning_notebooks/5.0.0_PyVRP_cvrptw_solver.ipynb

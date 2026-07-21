@@ -14,5 +14,5 @@ To install MAEnvs4VRP locally on your machine:
 
 .. code:: shell
 
-    git clone https://github.com/ricgama/maenvs4vrp.git && cd maenvs4vrp
+    git clone https://github.com/MAEnvs4VRP/maenvs4vrp.git && cd maenvs4vrp
     pip install -e .
