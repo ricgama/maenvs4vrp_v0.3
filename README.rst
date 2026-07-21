@@ -195,52 +195,6 @@ Or activate the environment traditionally if you prefer:
     source .venv/bin/activate  # On Windows: .venv\Scripts\activate
     python your_script.py
 
-**Development installation:**
-
-By default, ``uv sync`` installs only the core runtime dependencies (numpy, torch, pandas, etc.).
-To include optional dependencies for testing and documentation:
-
-.. code:: shell
-
-    uv sync --extra dev          # Add testing tools (pytest, jupyter)
-    uv sync --extra docs         # Add documentation tools (sphinx, etc.)
-    uv sync --extra dev --extra docs  # Add both
-    uv sync --all-extras         # Add all optional dependencies
-
-Working with uv
----------------
-
-Here are the most common ``uv`` commands you'll need:
-
-.. code:: shell
-
-    # Sync/install dependencies
-    uv sync                          # Install all dependencies from pyproject.toml
-    uv sync --extra dev              # Include dev dependencies (pytest, etc.)
-    uv sync --extra docs             # Include docs dependencies (sphinx, etc.)
-
-    # Run commands in the environment
-    uv run python script.py          # Run a Python script
-    uv run pytest                    # Run tests
-    uv run jupyter notebook          # Launch Jupyter
-
-    # Manage dependencies (modifies pyproject.toml)
-    uv add numpy                     # Add a new runtime dependency
-    uv add --dev pytest              # Add a development dependency
-    uv remove pandas                 # Remove a dependency
-
-    # Update dependencies
-    uv lock --upgrade                # Update lock file with latest versions
-    uv sync                          # Apply the updated dependencies
-
-    # Inspect environment
-    uv pip list                      # List all installed packages
-    uv pip show torch                # Show details for a specific package
-
-    # Clean/reset environment
-    rm -rf .venv                     # Delete the virtual environment
-    uv sync                          # Recreate it fresh
-
 
 For more details, see the `uv documentation <https://docs.astral.sh/uv/>`_.
 
@@ -291,15 +245,23 @@ We've prepared five hands-on notebooks that walk you through the library's diffe
 Training
 =============
 
-Two baseline models are available, which can be trained with:
+The built-in neuro solver baselines can be trained directly on any sequential environment. For example:
 
-.. code-block:: python
+**Attention Model — REINFORCE with shared baseline:**
 
-    uv run python maenvs4vrp/learning/mardam/train_mardam.py --vrp_env toptw --num_agents 5 --num_nodes 51  --val_set servs_50_agents_5 --selection stime
+.. code-block:: bash
 
-.. code-block:: python
+    uv run python maenvs4vrp/neuro_solvers/attention_model/train_reinforce_shared_baseline.py \
+        --vrp_env toptw --num_agents 5 --num_nodes 51 --selection stime
 
-    uv run python maenvs4vrp/learning/madyam/train_madyam.py --vrp_env toptw --num_agents 5 --num_nodes 51  --val_set servs_50_agents_5 --selection stime
+**Attention Model — PPO:**
+
+.. code-block:: bash
+
+    uv run python maenvs4vrp/neuro_solvers/attention_model/train_ppo.py \
+        --vrp_env toptw --num_agents 5 --num_nodes 51 --selection stime
+
+
 
 Unit Testing
 =================
