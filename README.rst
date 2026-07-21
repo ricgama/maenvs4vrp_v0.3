@@ -1,7 +1,7 @@
 .. raw:: html
 
    <p align="center">
-     <img src="docs/MAENVS4VRP banner 5.png" alt="MAEnvs4VRP Logo" width="650">
+     <img src="docs/MAENVS4VRP.png" alt="MAEnvs4VRP Logo" width="650">
    </p>
 
 MAEnvs4VRP is a library comprising multi-agent environments for simulating classic vehicle routing problems.
