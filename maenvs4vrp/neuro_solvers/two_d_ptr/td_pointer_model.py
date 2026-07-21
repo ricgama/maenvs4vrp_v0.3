@@ -372,7 +372,7 @@ class PolicyNet(nn.Module):
 
         self.nodes_dyn_embedding = DynamicEmbedding(nodes_dyn_obs_dim, embed_dim)
         self.agents_embedding = nn.Sequential(
-            nn.Linear(4, embed_dim * 4),
+            nn.Linear(agents_obs_dim, embed_dim * 4),
             nn.ReLU(),
             nn.Linear(embed_dim * 4, embed_dim)
         )

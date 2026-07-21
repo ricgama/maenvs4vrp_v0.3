@@ -35,7 +35,7 @@ from torch.optim.lr_scheduler import MultiStepLR
 
 import importlib
 
-from maenvs4vrp.learning.td_ptr.policy_net import PolicyNet
+from two_d_ptr.td_pointer_model import PolicyNet
 
 def save_model_state_dict(save_path, model_policy):
     # save the policy state dict
@@ -114,7 +114,7 @@ def train_epoch(args, env, policy, optim, ep, writer):
             entropy = []
             rewards = []
 
-            node_stat_obs = td['observations']['nodes_static_obs']
+            node_stat_obs = td['observations']['nodes_static_obs'].to(args.device)
 
             policy.make_cache_(nodes_obs=node_stat_obs)
 
@@ -122,30 +122,30 @@ def train_epoch(args, env, policy, optim, ep, writer):
 
                 # rollover the observation
                 try:
-                    node_dyn_obs = td['observations']['node_dynamic_obs']
+                    node_dyn_obs = td['observations']['node_dynamic_obs'].to(args.device)
                 except Exception:
                     node_dyn_obs = None
                 try:
-                    action_mask = td['observations']['action_mask']
+                    action_mask = td['observations']['action_mask'].to(args.device)
                 except Exception:
                     action_mask = None
                 try:
-                    agents_action_mask = td['observations']['agents_action_mask']
+                    agents_action_mask = td['observations']['agents_action_mask'].to(args.device)
                 except Exception:
                     agents_action_mask = None
                 try:
-                    active_agents_mask = td['observations']['active_agents_mask']
+                    active_agents_mask = td['observations']['active_agents_mask'].to(args.device)
                 except Exception:
                     active_agents_mask = None
                 try:
-                    all_agents_obs = td['observations']['all_agents_obs']
+                    all_agents_obs = td['observations']['all_agents_obs'].to(args.device)
                 except Exception:
                     all_agents_obs = None
                 try:
-                    global_obs = td['observations']['global_obs']
+                    global_obs = td['observations']['global_obs'].to(args.device)
                 except Exception:
                     global_obs = None
-                cur_nodes_idx = td['observations']['agents_cur_node_idx']
+                cur_nodes_idx = td['observations']['agents_cur_node_idx'].to(args.device)
 
                # get action from the policy
                 action, agent, logprobs, ent = policy.get_action_and_logs(nodes_obs=node_dyn_obs,
@@ -154,15 +154,15 @@ def train_epoch(args, env, policy, optim, ep, writer):
                                                                     agents_action_mask=agents_action_mask,
                                                                     active_agents_mask=active_agents_mask)
 
-                td['next_action'] = action.unsqueeze(-1)
-                td['next_agent'] = agent.unsqueeze(-1)
+                td['next_action'] = action.unsqueeze(-1).to(args.env_device)
+                td['next_agent'] = agent.unsqueeze(-1).to(args.env_device)
                 # execute the environment and log data
                 td = env.step_observe(td, obs_list=['agents_cur_node_idx', 'agents_action_mask', 'active_agents_mask','all_agents'])
 
                 logps.append(logprobs)
                 entropy.append(ent)
-                rewards.append(td['reward'] + td['penalty'])
-                step_mask.append(~td['done'])
+                rewards.append((td['reward'] + td['penalty']).to(args.device))
+                step_mask.append((~td['done']).to(args.device))
 
             #--------------------------------------------------------
             loss = reinforce_pomo_loss(logps, rewards, entropy, step_mask, args)
@@ -212,7 +212,7 @@ def test_epoch(args, test_env, policy, ep, writer):
     number_used_agents = []
 
     with torch.no_grad():
-        for instance_name in test_env.inst_generator.set_of_instances:
+        for instance_name in test_env.inst_generator.list_of_instances:
 
             td = test_env.reset_agent_select_observe(num_agents=args.num_agents,
                                 num_nodes=args.num_nodes,
@@ -223,37 +223,37 @@ def test_epoch(args, test_env, policy, ep, writer):
                                 seed=0)
 
             f_reward = []
-            node_stat_obs = td['observations']['nodes_static_obs']
+            node_stat_obs = td['observations']['nodes_static_obs'].to(args.device)
             policy.make_cache_(nodes_obs=node_stat_obs)
 
             while not td["done"].all():
 
                 # rollover the observation
                 try:
-                    node_dyn_obs = td['observations']['node_dynamic_obs']
+                    node_dyn_obs = td['observations']['node_dynamic_obs'].to(args.device)
                 except Exception:
                     node_dyn_obs = None
                 try:
-                    action_mask = td['observations']['action_mask']
+                    action_mask = td['observations']['action_mask'].to(args.device)
                 except Exception:
                     action_mask = None
                 try:
-                    agents_action_mask = td['observations']['agents_action_mask']
+                    agents_action_mask = td['observations']['agents_action_mask'].to(args.device)
                 except Exception:
                     agents_action_mask = None
                 try:
-                    active_agents_mask = td['observations']['active_agents_mask']
+                    active_agents_mask = td['observations']['active_agents_mask'].to(args.device)
                 except Exception:
                     active_agents_mask = None
                 try:
-                    all_agents_obs = td['observations']['all_agents_obs']
+                    all_agents_obs = td['observations']['all_agents_obs'].to(args.device)
                 except Exception:
                     all_agents_obs = None
                 try:
-                    global_obs = td['observations']['global_obs']
+                    global_obs = td['observations']['global_obs'].to(args.device)
                 except Exception:
                     global_obs = None
-                cur_nodes_idx = td['observations']['agents_cur_node_idx']
+                cur_nodes_idx = td['observations']['agents_cur_node_idx'].to(args.device)
 
                 # get action from the agent
                 action, agent, _, _ = policy.get_action_and_logs(nodes_obs=node_dyn_obs,
@@ -264,8 +264,8 @@ def test_epoch(args, test_env, policy, ep, writer):
                                                             deterministic=True)
 
                 # execute the environment and log data
-                td['next_action'] = action.unsqueeze(-1)
-                td['next_agent'] = agent.unsqueeze(-1)
+                td['next_action'] = action.unsqueeze(-1).to(args.env_device)
+                td['next_agent'] = agent.unsqueeze(-1).to(args.env_device)
                 td = test_env.step_observe(td, obs_list=['agents_cur_node_idx', 'agents_action_mask', 'active_agents_mask','all_agents'])
 
                 f_reward.append(td['reward'] + td['penalty'])
@@ -346,7 +346,7 @@ def train(args, writer):
     observations = importlib.import_module(observations_module_name).Observations(feature_list)
 
     generator_module_name = f'maenvs4vrp.environments.{args.vrp_env}.instances_generator'
-    generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.device)
+    generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.env_device)
 
     environment_module_name = f'maenvs4vrp.environments.{args.vrp_env}.env'
     environment_module = importlib.import_module(environment_module_name)
@@ -359,24 +359,24 @@ def train(args, writer):
                                         obs_builder_object=observations,
                                         agent_selector_object=env_agent_selector,
                                         reward_evaluator=reward_evaluator,
-                                        device=args.device,
+                                        device=args.env_device,
                                         batch_size = args.batch_size,
                                         seed=args.seed)
 
 
     if args.val_set == 'None':
-        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.device)
+        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.env_device)
     else:
         set_of_instances = set(generator.get_list_of_benchmark_instances()[args.val_set]['validation'])
-        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(set_of_instances=set_of_instances,
-                                                                                          device=args.device)
+        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(list_of_instances=set_of_instances,
+                                                                                          device=args.env_device)
         args.eval_batch_size = None
 
     eval_env = environment_module.Environment(instance_generator_object=eval_generator,
                                             obs_builder_object=observations,
                                             agent_selector_object=env_agent_selector,
                                             reward_evaluator=reward_evaluator,
-                                            device=args.device,
+                                            device=args.env_device,
                                             batch_size = args.eval_batch_size,
                                             seed=args.eval_seed)
 
@@ -416,9 +416,13 @@ def train(args, writer):
     for ep in range(0, args.epoch_count):
         train_stats.append(train_epoch(args, env, policy, optim, ep, writer) )
         scheduler.step()
-        test_metrics = test_epoch(args, eval_env, policy, ep, writer)
-        test_stats.append(test_metrics)
-        latest_episodic_return = test_metrics[0]
+
+        if args.val_set != 'None':
+            test_metrics = test_epoch(args, eval_env, policy, ep, writer)
+            test_stats.append(test_metrics)
+            latest_episodic_return = test_metrics[0]
+        else:
+            latest_episodic_return = None
 
         writer.add_scalar("charts/SPS", int(ep / (time.time() - start_time)), ep)
 
@@ -428,7 +432,7 @@ def train(args, writer):
         policy.to(args.device)
         print ('done')
 
-        if latest_episodic_return > best_lb_total_return:
+        if latest_episodic_return is not None and latest_episodic_return > best_lb_total_return:
             print ('Old best model: {: .2f}'.format(best_lb_total_return))
             best_lb_total_return = latest_episodic_return
             print ('New best model: {: .2f}'.format(latest_episodic_return))
@@ -436,7 +440,7 @@ def train(args, writer):
             save_model_state_dict(osp.join(args.log_path, "models/best_model_"+args.run_name+".zip"), policy)
             policy.to(args.device)
             print ('done')
-        else:
+        elif latest_episodic_return is not None:
             print ('No improvement')
             print (f'Latest model: {latest_episodic_return}')
             print (f'Current best model: {best_lb_total_return}')
@@ -467,6 +471,7 @@ def get_args():
     args = parse_args()
     args.model_name = '2d_ptr_model'
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    args.env_device = torch.device("cpu")  # env runs on CPU; policy/obs on args.device
     args.learning_rate = 0.0001
     args.weight_decay = 1e-6
     args.norm_adv = False
@@ -485,7 +490,7 @@ def get_args():
     args.eval_seed = 0
     args.time = time.strftime("%Y_%m_%d_%Hh%Mm")
     args.run_name = f"{args.model_name}_{args.vrp_env}_{args.selection}_{args.num_nodes}n_{args.num_agents}a_{args.time}"
-    args.debug =  False
+    args.debug =  True
     return args
 
 
@@ -496,7 +501,7 @@ def main(args):
         set_random_seed(args.seed, args.torch_deterministic)
 
     if not args.debug:
-        wandb.init(project="base learning", entity="mustelideos",
+        wandb.init(project="your project", entity="your entity",
                 sync_tensorboard=True,
                 config=vars(args),
                 monitor_gym=False,

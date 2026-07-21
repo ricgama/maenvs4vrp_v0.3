@@ -32,9 +32,7 @@ import wandb
 #from ml_collections import config_dict
 import importlib
 
-
-
-from maenvs4vrp.learning.AM.policy_net_am import ActionCriticNet
+from attention_model.policy_net_am import ActionCriticNet
 
 def save_model_state_dict(save_path, model_policy):
     # save the policy state dict
@@ -111,7 +109,7 @@ def train(args, writer):
     observations = importlib.import_module(observations_module_name).Observations(feature_list)
 
     generator_module_name = f'maenvs4vrp.environments.{args.vrp_env}.instances_generator'
-    generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.device)
+    generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.env_device)
 
     environment_module_name = f'maenvs4vrp.environments.{args.vrp_env}.env'
     environment_module = importlib.import_module(environment_module_name)
@@ -123,23 +121,23 @@ def train(args, writer):
                     obs_builder_object=observations,
                     agent_selector_object=env_agent_selector,
                     reward_evaluator=reward_evaluator,
-                    device=args.device,
+                    device=args.env_device,
                     batch_size = args.batch_size,
                     seed=args.seed)
 
     if args.val_set == 'None':
-        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.device)
+        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(device=args.env_device)
     else:
         set_of_instances = set(generator.get_list_of_benchmark_instances()[args.val_set]['validation'])
-        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(set_of_instances=set_of_instances,
-                                                                                          device=args.device)
+        eval_generator = importlib.import_module(generator_module_name).InstanceGenerator(list_of_instances=set_of_instances,
+                                                                                          device=args.env_device)
         args.eval_batch_size = None
 
     eval_env = environment_module.Environment(instance_generator_object=eval_generator,
                     obs_builder_object=observations,
                     agent_selector_object=env_agent_selector,
                     reward_evaluator=reward_evaluator,
-                    device=args.device,
+                    device=args.env_device,
                     batch_size = args.eval_batch_size,
                     seed=args.eval_seed)
 
@@ -202,7 +200,7 @@ def train(args, writer):
             final_reward =  torch.zeros(n_envs).to(args.device)
             step_mask = torch.ones(n_envs, dtype=torch.bool).to(args.device)
 
-            node_stat_obs = td['observations']['nodes_static_obs']
+            node_stat_obs = td['observations']['nodes_static_obs'].to(args.device)
 
             policy_critic_net.policy.make_cache_(nodes_obs=node_stat_obs)
 
@@ -211,22 +209,22 @@ def train(args, writer):
 
                 # rollover the observation
                 try:
-                    node_dyn_obs = td['observations']['node_dynamic_obs']
+                    node_dyn_obs = td['observations']['node_dynamic_obs'].to(args.device)
                 except Exception:
                     node_dyn_obs = None
                 try:
-                    action_mask = td['observations']['action_mask']
+                    action_mask = td['observations']['action_mask'].to(args.device)
                 except Exception:
                     action_mask = None
                 try:
-                    self_obs = td['observations']['agent_obs']
+                    self_obs = td['observations']['agent_obs'].to(args.device)
                 except Exception:
                     self_obs = None
                 try:
-                    global_obs = td['observations']['global_obs']
+                    global_obs = td['observations']['global_obs'].to(args.device)
                 except Exception:
                     global_obs = None
-                cur_node_idx = td['observations']['agent_cur_node_idx']
+                cur_node_idx = td['observations']['agent_cur_node_idx'].to(args.device)
 
                 # get action from the agent
                 action, logprobs, entropy, values = policy_critic_net.get_action_and_logs(nodes_dyn_obs=node_dyn_obs,
@@ -235,7 +233,7 @@ def train(args, writer):
                                                                     cur_node_idx=cur_node_idx,
                                                                     action_mask=action_mask)
 
-                td['next_action'] = action.unsqueeze(1)
+                td['next_action'] = action.unsqueeze(1).to(args.env_device)
 
                 # execute the environment and log data
                 td = env.step_agent_select_observe(td, obs_list=['agent_cur_node_idx', 'nodes_static', 'action_mask', 'agent'])
@@ -250,13 +248,13 @@ def train(args, writer):
                 rb_cur_node_idx[step_idx] = cur_node_idx.squeeze(-1)
 
                 rb_step_mask[step_idx] = step_mask
-                rb_rewards[step_idx] = td['reward'].squeeze(1) + td['penalty'].squeeze(1)
+                rb_rewards[step_idx] = (td['reward'].squeeze(1) + td['penalty'].squeeze(1)).to(args.device)
 
                 rb_actions[step_idx] = action.to(torch.long)
                 rb_logprobs[step_idx] = logprobs
                 rb_entropy[step_idx] = entropy
                 rb_values[step_idx] = values.squeeze(1)
-                step_mask = ~td['done']
+                step_mask = (~td['done']).to(args.device)
                 step_idx += 1
 
             final_reward = rb_rewards.detach().sum(0)
@@ -418,12 +416,8 @@ def train(args, writer):
             writer.add_scalar("epoch/number_used_agents", ep_nagent  / n, ep_num)
             ep_loss = ep_pg_loss = ep_vloss = ep_ent = ep_rew = ep_nvnodes = ep_nagent = 0
 
-        if episode % args.eval_num_print == 0:
+        if episode % args.eval_num_print == 0 and args.val_set != 'None':
             print("\n-------------------------------------------\n")
-
-            #print ('Saving latest model...')
-            #save_model_state_dict(osp.join(args.log_path, "models/latest_model.zip"), agent_policy)
-            #print ('done')
 
             print (f'Running eval on validation set')
             latest_episodic_return, not_visited_nodes, number_used_agents = evaluate(args, writer, eval_env, policy_critic_net, episode)
@@ -469,7 +463,7 @@ def evaluate(args, writer, eval_env, policy, ep):
     number_used_agents = []
 
     with torch.no_grad():
-        for instance_name in eval_env.inst_generator.set_of_instances:
+        for instance_name in eval_env.inst_generator.list_of_instances:
 
             td = eval_env.reset_agent_select_observe(num_agents=args.num_agents,
                                 num_nodes=args.num_nodes,
@@ -480,29 +474,29 @@ def evaluate(args, writer, eval_env, policy, ep):
                                 obs_list=['agent_cur_node_idx', 'nodes_static', 'action_mask', 'agent'])
 
             f_reward = []
-            node_stat_obs = td['observations']['nodes_static_obs']
+            node_stat_obs = td['observations']['nodes_static_obs'].to(args.device)
             policy.policy.make_cache_(nodes_obs=node_stat_obs)
 
             while not td["done"].all():
 
                 # rollover the observation
                 try:
-                    node_dyn_obs = td['observations']['node_dynamic_obs']
+                    node_dyn_obs = td['observations']['node_dynamic_obs'].to(args.device)
                 except Exception:
                     node_dyn_obs = None
                 try:
-                    action_mask = td['observations']['action_mask']
+                    action_mask = td['observations']['action_mask'].to(args.device)
                 except Exception:
                     action_mask = None
                 try:
-                    self_obs = td['observations']['agent_obs']
+                    self_obs = td['observations']['agent_obs'].to(args.device)
                 except Exception:
                     self_obs = None
                 try:
-                    global_obs = td['observations']['global_obs']
+                    global_obs = td['observations']['global_obs'].to(args.device)
                 except Exception:
                     global_obs = None
-                cur_node_idx = td['observations']['agent_cur_node_idx']
+                cur_node_idx = td['observations']['agent_cur_node_idx'].to(args.device)
 
                 # get action from the agent
                 action, _, _ = policy.policy.get_action_and_logs(nodes_obs=node_dyn_obs,
@@ -513,7 +507,7 @@ def evaluate(args, writer, eval_env, policy, ep):
                                                             deterministic=True)
 
                 # execute the environment and log data
-                td['next_action'] = action.unsqueeze(1)
+                td['next_action'] = action.unsqueeze(1).to(args.env_device)
                 td = eval_env.step_agent_select_observe(td, obs_list=['agent_cur_node_idx', 'nodes_static', 'action_mask', 'agent'])
 
                 f_reward.append(td['reward'] + td['penalty'])
@@ -549,6 +543,7 @@ def get_args():
     args = parse_args()
     args.model_name = 'am_ppo_model'
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    args.env_device = torch.device("cpu")  # env runs on CPU; policy/obs on args.device
     args.ent_coef = 0.01
     args.vf_coef = 0.5
     args.clip_coef = 0.05
@@ -584,7 +579,7 @@ def get_args():
     args.eval_num_print = 2500
     args.time = time.strftime("%Y_%m_%d_%Hh%Mm")
     args.run_name = f"{args.model_name}_{args.vrp_env}_{args.selection}_{args.num_nodes}n_{args.num_agents}a_{args.time}"
-    args.debug = False
+    args.debug = True
     return args
 
 
@@ -595,7 +590,7 @@ def main(args):
         set_random_seed(args.seed, args.torch_deterministic)
 
     if not args.debug:
-        wandb.init(project="base learning", entity="mustelideos",
+        wandb.init(project="your project", entity="your entity",
                 sync_tensorboard=True,
                 config=vars(args),
                 monitor_gym=False,
