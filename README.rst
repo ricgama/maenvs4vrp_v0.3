@@ -1,12 +1,10 @@
 .. raw:: html
 
    <p align="center">
-     <img src="docs/source/img/banner.png" alt="MAEnvs4VRP Logo" width="650">
+     <img src="docs/MAENVS4VRP banner 5.png" alt="MAEnvs4VRP Logo" width="650">
    </p>
 
-Multi Agent Environments for Vehicle Routing Problems
-
-MAEnvs4VRP is a library made up of multi-agent environments for simulating classic vehicle routing problems.
+MAEnvs4VRP is a library comprising multi-agent environments for simulating classic vehicle routing problems.
 
 `Documentation <https://maenvs4vrp.readthedocs.io/en/latest/>`_ | `Install <#install>`_ | `Quickstart Notebook <https://maenvs4vrp.readthedocs.io/en/latest/content/start.html>`_ | `Train Your Model <#training>`_ | `Paper <https://arxiv.org/abs/2411.14411>`_
 
@@ -17,9 +15,9 @@ MAEnvs4VRP is a library made up of multi-agent environments for simulating class
 What's NEW in v0.2!
 =====================
 
-- Added six new environments: **DVRPTW**, **DSVRPTW**, **MTVRP**, **MTDVRP**, **GMTVRP**, and **GMTDVRP**  
-- Introduced three new hands-on Jupyter notebook tutorials  
-- Integrated plotting tools for visualization and analysis 
+- Added six new environments: **DVRPTW**, **DSVRPTW**, **MTVRP**, **MTDVRP**, **GMTVRP**, and **GMTDVRP**
+- Introduced three new hands-on Jupyter notebook tutorials
+- Integrated plotting tools for visualization and analysis
 - Now every environment includes a ``check_solution_validity()`` method
 
 Environments
@@ -75,20 +73,113 @@ Environments
 Install
 ==========
 
-For a clean setup, isolate library dependencies using a virtual environment. The library requires Python 3.11 or higher for installation, and it has been tested and confirmed stable with Python 3.13.5.
-To create an isolated environment with conda:
+Prerequisites
+-------------
+
+The library requires Python 3.11 or higher for installation, and it has been tested and confirmed stable with Python 3.13.5.
+
+We use `uv <https://docs.astral.sh/uv/>`_ for fast, reliable dependency management. If you're familiar with ``pip`` and ``virtualenv``, ``uv`` works similarly but is much faster and handles environment creation automatically.
+
+Install uv:
 
 .. code:: shell
 
-    conda create --name maenvs4vrp python=3.13.5
-    conda activate maenvs4vrp
+    # macOS with Homebrew
+    brew install uv
 
-To install MAENVS4VRP locally on your machine:
+    # macOS and Linux (official installer)
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    # Windows
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+    # Or with pip/pipx
+    pip install uv
+
+Installation
+------------
+
+Clone the repository and install the package:
 
 .. code:: shell
 
     git clone https://github.com/ricgama/maenvs4vrp.git && cd maenvs4vrp
-    pip install -e .
+    uv sync
+
+That's it! ``uv sync`` automatically:
+
+- Creates a virtual environment in ``.venv/``
+- Installs Python 3.13.5 (if needed)
+- Installs all dependencies from ``pyproject.toml``
+- Creates a ``uv.lock`` file for reproducible builds
+
+.. note::
+   The ``uv.lock`` file pins exact dependency versions for reproducibility.
+   It's committed to the repository to ensure consistent environments across
+   development and CI, but doesn't affect users who install the package via pip.
+
+To run commands in this environment, use ``uv run``:
+
+.. code:: shell
+
+    uv run python your_script.py
+    uv run pytest
+
+Or activate the environment traditionally if you prefer:
+
+.. code:: shell
+
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+    python your_script.py
+
+**Development installation:**
+
+By default, ``uv sync`` installs only the core runtime dependencies (numpy, torch, pandas, etc.).
+To include optional dependencies for testing and documentation:
+
+.. code:: shell
+
+    uv sync --extra dev          # Add testing tools (pytest, jupyter)
+    uv sync --extra docs         # Add documentation tools (sphinx, etc.)
+    uv sync --extra dev --extra docs  # Add both
+    uv sync --all-extras         # Add all optional dependencies
+
+Working with uv
+---------------
+
+Here are the most common ``uv`` commands you'll need:
+
+.. code:: shell
+
+    # Sync/install dependencies
+    uv sync                          # Install all dependencies from pyproject.toml
+    uv sync --extra dev              # Include dev dependencies (pytest, etc.)
+    uv sync --extra docs             # Include docs dependencies (sphinx, etc.)
+
+    # Run commands in the environment
+    uv run python script.py          # Run a Python script
+    uv run pytest                    # Run tests
+    uv run jupyter notebook          # Launch Jupyter
+
+    # Manage dependencies (modifies pyproject.toml)
+    uv add numpy                     # Add a new runtime dependency
+    uv add --dev pytest              # Add a development dependency
+    uv remove pandas                 # Remove a dependency
+
+    # Update dependencies
+    uv lock --upgrade                # Update lock file with latest versions
+    uv sync                          # Apply the updated dependencies
+
+    # Inspect environment
+    uv pip list                      # List all installed packages
+    uv pip show torch                # Show details for a specific package
+
+    # Clean/reset environment
+    rm -rf .venv                     # Delete the virtual environment
+    uv sync                          # Recreate it fresh
+
+
+For more details, see the `uv documentation <https://docs.astral.sh/uv/>`_.
 
 Getting Started
 ===================
@@ -141,32 +232,38 @@ Two baseline models are available, which can be trained with:
 
 .. code-block:: python
 
-    python maenvs4vrp/learning/mardam/train_mardam.py --vrp_env toptw --num_agents 5 --num_nodes 51  --val_set servs_50_agents_5 --selection stime
+    uv run python maenvs4vrp/learning/mardam/train_mardam.py --vrp_env toptw --num_agents 5 --num_nodes 51  --val_set servs_50_agents_5 --selection stime
 
 .. code-block:: python
 
-    python maenvs4vrp/learning/madyam/train_madyam.py --vrp_env toptw --num_agents 5 --num_nodes 51  --val_set servs_50_agents_5 --selection stime
+    uv run python maenvs4vrp/learning/madyam/train_madyam.py --vrp_env toptw --num_agents 5 --num_nodes 51  --val_set servs_50_agents_5 --selection stime
 
 Unit Testing
 =================
 
-Unit tests are located in the `/tests/unit/environments` directory.
+Unit tests are located in the `/tests/unit/` directory.
 
-You can run individual tests as follows:
-
-.. code-block:: bash
-
-    pytest seed_test.py
+First, ensure you have the development dependencies installed:
 
 .. code-block:: bash
 
-    pytest reset_seed.py
+    uv sync --extra dev
+
+Then you can run individual tests as follows:
+
+.. code-block:: bash
+
+    uv run pytest tests/unit/test_environment_setup.py
+
+.. code-block:: bash
+
+    uv run pytest tests/unit/environments/seed_test.py
 
 To run the full unit test suite and verify compatibility across different environments with customizable parameters, use:
 
 .. code-block:: bash
 
-    pytest --device cpu --batch 1 --num_agents 2 --num_nodes 11
+    uv run pytest --device cpu --batch 1 --num_agents 2 --num_nodes 11
 
 For additional details and examples, please refer to the documentation.
 
@@ -219,13 +316,13 @@ To credit the library in your publications, use this citation:
 
 Contributing
 ============
-We welcome contributions to **MAEnvs4VRP**!  
-If you’d like to use this library in your academic research/industry projects, or if you have suggestions, feature requests, or any feedback, we’d be happy to hear from you.  
+We welcome contributions to **MAEnvs4VRP**!
+If you'd like to use this library in your academic research/industry projects, or if you have suggestions, feature requests, or any feedback, we'd be happy to hear from you.
 
-You can **open an issue** here on GitHub or **drop us an email** — we’d love to collaborate and improve the project together.
+Feel free to `open an issue <https://github.com/ricgama/maenvs4vrp/issues>`_ or submit a `pull request <https://github.com/ricgama/maenvs4vrp/pulls>`_. If you would like to contribute, please check out our contribution guidelines `here <https://github.com/ricgama/maenvs4vrp/blob/pre_commit_setup/.github/CONTRIBUTING.rst>`_. We welcome and look forward to all contributions to MAEnvs4vrp
 
 
 Acknowledgements
 =================
-MAEnvs4VRP has been inspired by, and benefits from, the ideas and tooling of the broader open-source community. In particular, we would like to thank `PettingZoo <https://www.pettingzoo.ml/>`_, 
+MAEnvs4VRP has been inspired by, and benefits from, the ideas and tooling of the broader open-source community. In particular, we would like to thank `PettingZoo <https://www.pettingzoo.ml/>`_,
 `Flatland <https://github.com/flatland-association/flatland-rl/>`_, `MARDAM <https://gitlab.inria.fr/gbono/mardam>`_, `RL4CO <https://rl4co.readthedocs.io/en/latest//>`_, `RoutFinder <https://github.com/ai4co/routefinder/tree/main//>`_, `PyVRP <https://pyvrp.org//>`_ .
