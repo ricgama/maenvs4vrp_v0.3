@@ -1,3 +1,52 @@
+Metadata-Version: 2.4
+Name: maenvs4vrp
+Version: 0.3
+Summary: Multi Agent Environments for Vehicle Routing Problems
+Author: mustelideos
+License: MIT
+Project-URL: Homepage, https://github.com/ricgama/maenvs4vrp
+Project-URL: Documentation, https://maenvs4vrp.readthedocs.io
+Project-URL: Repository, https://github.com/ricgama/maenvs4vrp
+Project-URL: Bug Tracker, https://github.com/ricgama/maenvs4vrp/issues
+Project-URL: Paper, https://arxiv.org/abs/2411.14411
+Keywords: multi-agent,reinforcement-learning,vehicle-routing,vrp,operations-research,optimization
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.11, <4
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: numpy>=2.3.1
+Requires-Dist: tqdm>=4.66.1
+Requires-Dist: pandas>=2.3.0
+Requires-Dist: matplotlib>=3.10.5
+Requires-Dist: torch<3.0,>=2.7.0
+Requires-Dist: tensorboard>=2.13.0
+Requires-Dist: scipy>=1.0.0
+Requires-Dist: wandb>=0.10.0
+Requires-Dist: huggingface_hub>=0.10.0
+Requires-Dist: ml_collections>=0.1.0
+Requires-Dist: tensordict>=0.9.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.3; extra == "dev"
+Requires-Dist: ipykernel>=6.0.0; extra == "dev"
+Requires-Dist: ipywidgets>=8.0.0; extra == "dev"
+Requires-Dist: jupyter>=1.0.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx-math-dollar>=1.2.1; extra == "docs"
+Requires-Dist: nbsphinx>=0.9.5; extra == "docs"
+Requires-Dist: furo>=2024.8.6; extra == "docs"
+Requires-Dist: sphinx-copybutton>=0.5.2; extra == "docs"
+Dynamic: license-file
+Dynamic: requires-python
+
 .. image:: https://raw.githubusercontent.com/MAEnvs4VRP/maenvs4vrp/master/docs/source/img/banner.png
    :alt: MAEnvs4VRP Logo
 
